@@ -1,1 +1,7 @@
+# param comtroll
 click
+# bigquery
+wheel
+proto-plus
+grpcio
+google-cloud-bigquery

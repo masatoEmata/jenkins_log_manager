@@ -28,6 +28,7 @@ class JenkinsBase:
 
     def get_log(self):
         uri = self._generate_uri()
+        print(f'Requested URL: {uri}')
         return get(uri, auth=self.auth)
 
     def parse_log(self):
