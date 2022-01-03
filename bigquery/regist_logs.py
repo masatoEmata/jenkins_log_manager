@@ -29,6 +29,6 @@ class Register(BigqueryBase):
 
 
 if __name__ == '__main__':
-    bq = Register('remarketing-mail', 'demo', 'mail_history')
-    result = bq.insert([('2021-12-24 09:58:23.688007 UTC', 'emata+2@espalhar.net', 'test_user_id_value', 'main')])
+    bq = Register('my-project-xxx', 'my_dataset_xxx', 'my_table')
+    result = bq.insert([('2021-12-24 09:58:23.688007 UTC', 'xxx@xxx.com', 'test_user_id_value', 'main')])
     print(result)

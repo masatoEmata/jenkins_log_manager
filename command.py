@@ -4,18 +4,34 @@ from bigquery.regist_logs import Record, Register
 import click
 
 @click.command()
-@click.option('--host')
-@click.option('--job_path')
-@click.option('--user')
-@click.option('--pswd')
-def command(host: str, job_path: str, user: str, pswd: str):
+@click.option('--bigquery_project')
+@click.option('--bigquery_dataset')
+@click.option('--bigquery_table')
+@click.option('--jenkins_host')
+@click.option('--jenkins_job_path')
+@click.option('--jenkins_user')
+@click.option('--jenkins_pswd')
+@click.option('--jenkins_buildnum_start')
+@click.option('--jenkins_buildnum_end')
+
+def command(
+    bigquery_project: str,
+    bigquery_dataset: str,
+    bigquery_table: str,
+    jenkins_host: str,
+    jenkins_job_path: str,
+    jenkins_user: str,
+    jenkins_pswd: str,
+    jenkins_buildnum_start: str,
+    jenkins_buildnum_end: str
+    ):
     def insert_jenkins_build_log(build_num):
-        def jenkins_log_collect(host: str, job_path: str, user: str, pswd: str):
+        def jenkins_log_collect():
             """Get build log text & use them.
             """
             build_path = f'/{build_num}/consoleText'
-            path = Path(host, job_path, build_path)
-            key = Auth(user, pswd).key()
+            path = Path(jenkins_host, jenkins_job_path, build_path)
+            key = Auth(jenkins_user, jenkins_pswd).key()
             jenkins = JenkinsBase(path, key)
             log = jenkins.get_log()
             lines = re.findall('VALUES\s\((.+)\)', log.text)
@@ -46,13 +62,18 @@ def command(host: str, job_path: str, user: str, pswd: str):
                 sql_rows.append(sql_row)
             return sql_rows
 
-        records = jenkins_log_collect(host, job_path, user, pswd)
+        def insert_sql_rows(sql_rows):
+            history_register = Register(bigquery_project, bigquery_dataset, bigquery_table)
+            history_register.insert(sql_rows)
+
+        records = jenkins_log_collect()
         sql_rows = create_sql_rows(records)
         print(f'SQL rows: {sql_rows}')
-        history_register = Register(project_name='remarketing-mail', dataset_name='demo', table_name='history_restore')
-        history_register.insert(sql_rows)
 
-    for i in range(2425, 2430):
+        if len(sql_rows) > 0:
+            insert_sql_rows(sql_rows)
+
+    for i in range(int(jenkins_buildnum_start), int(jenkins_buildnum_end)):
         insert_jenkins_build_log(i)
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from google.cloud import bigquery
 
 class BigqueryBase:
@@ -8,5 +7,5 @@ class BigqueryBase:
 
 if __name__ == '__main__':
     bq = BigqueryBase()
-    result = bq.custom_query('SELECT * FROM `remarketing-mail.demo.mail_history` LIMIT 1000')
+    result = bq.custom_query('SELECT * FROM `my-project-xxx.my_dataset_xxx.my_table` LIMIT 1000')
     print(result)
